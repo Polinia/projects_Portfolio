@@ -1,0 +1,2769 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 468,
+   "metadata": {
+    "_cell_guid": "b1076dfc-b9ad-4769-8c92-a6c4dae69d19",
+    "_uuid": "8f2839f25d086af736a60e9eeb907d3b93b6e0e5",
+    "colab": {},
+    "colab_type": "code",
+    "id": "U2D2gTdJVp90"
+   },
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import pandas as pd\n",
+    "import seaborn as sns\n",
+    "import matplotlib.pyplot as plt\n",
+    "import collections\n",
+    "from collections import Counter\n",
+    "import itertools\n",
+    "from itertools import combinations"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 469,
+   "metadata": {
+    "_cell_guid": "79c7e3d0-c299-4dcb-8224-4455121ee9b0",
+    "_uuid": "d629ff2d2480ee46fbb7e2d37f6b5fab8052498a",
+    "colab": {},
+    "colab_type": "code",
+    "id": "oyGfxL3eVp9-"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>imdb_id</th>\n",
+       "      <th>budget</th>\n",
+       "      <th>revenue</th>\n",
+       "      <th>original_title</th>\n",
+       "      <th>cast</th>\n",
+       "      <th>director</th>\n",
+       "      <th>tagline</th>\n",
+       "      <th>overview</th>\n",
+       "      <th>runtime</th>\n",
+       "      <th>genres</th>\n",
+       "      <th>production_companies</th>\n",
+       "      <th>release_date</th>\n",
+       "      <th>vote_average</th>\n",
+       "      <th>release_year</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>1104</th>\n",
+       "      <td>tt0332379</td>\n",
+       "      <td>35000000</td>\n",
+       "      <td>131282949</td>\n",
+       "      <td>The School of Rock</td>\n",
+       "      <td>Jack Black|Joan Cusack|Mike White|Sarah Silver...</td>\n",
+       "      <td>Richard Linklater</td>\n",
+       "      <td>He just landed the gig of his life: 5th grade.</td>\n",
+       "      <td>Fired from his band and hard up for cash, guit...</td>\n",
+       "      <td>108</td>\n",
+       "      <td>Comedy|Music</td>\n",
+       "      <td>Paramount Pictures</td>\n",
+       "      <td>10/3/2003</td>\n",
+       "      <td>6.6</td>\n",
+       "      <td>2003</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>780</th>\n",
+       "      <td>tt1622979</td>\n",
+       "      <td>47000000</td>\n",
+       "      <td>157887643</td>\n",
+       "      <td>Final Destination 5</td>\n",
+       "      <td>Emma Bell|Nicholas D'Agosto|Miles Fisher|Ellen...</td>\n",
+       "      <td>Steven Quale</td>\n",
+       "      <td>We all share a common destination.</td>\n",
+       "      <td>In this fifth installment, Death is just as om...</td>\n",
+       "      <td>92</td>\n",
+       "      <td>Horror|Mystery</td>\n",
+       "      <td>New Line Cinema|Practical Pictures|Parallel Zide</td>\n",
+       "      <td>8/12/2011</td>\n",
+       "      <td>5.9</td>\n",
+       "      <td>2011</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>642</th>\n",
+       "      <td>tt0494238</td>\n",
+       "      <td>60000000</td>\n",
+       "      <td>57490374</td>\n",
+       "      <td>Inkheart</td>\n",
+       "      <td>Brendan Fraser|Sienna Guillory|Andy Serkis|Eli...</td>\n",
+       "      <td>Iain Softley</td>\n",
+       "      <td>Every story ever written is just waiting to be...</td>\n",
+       "      <td>The adventures of a father and his young daugh...</td>\n",
+       "      <td>106</td>\n",
+       "      <td>Adventure|Family|Fantasy</td>\n",
+       "      <td>New Line Cinema|Internationale Filmproduktion ...</td>\n",
+       "      <td>12/11/2008</td>\n",
+       "      <td>5.8</td>\n",
+       "      <td>2008</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>768</th>\n",
+       "      <td>tt1449283</td>\n",
+       "      <td>30000000</td>\n",
+       "      <td>14460000</td>\n",
+       "      <td>Winnie the Pooh</td>\n",
+       "      <td>Jim Cummings|Travis Oates|Jim Cummings|Bud Luc...</td>\n",
+       "      <td>Stephen Anderson|Don Hall</td>\n",
+       "      <td>Oh Pooh.</td>\n",
+       "      <td>During an ordinary day in Hundred Acre Wood, W...</td>\n",
+       "      <td>63</td>\n",
+       "      <td>Animation|Family</td>\n",
+       "      <td>Walt Disney Pictures|Walt Disney Animation Stu...</td>\n",
+       "      <td>4/13/2011</td>\n",
+       "      <td>6.8</td>\n",
+       "      <td>2011</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1655</th>\n",
+       "      <td>tt0338512</td>\n",
+       "      <td>74500000</td>\n",
+       "      <td>62172050</td>\n",
+       "      <td>Deux frÃ¨res</td>\n",
+       "      <td>MaÃ¯ Anh Le|Guy Pearce|Oanh Nguyen|Jaran 'See ...</td>\n",
+       "      <td>Jean-Jacques Annaud</td>\n",
+       "      <td>Two infant tiger cubs, separated from their pa...</td>\n",
+       "      <td>Two tigers are separated as cubs and taken int...</td>\n",
+       "      <td>109</td>\n",
+       "      <td>Adventure|Drama|Family</td>\n",
+       "      <td>PathÃ© Renn Productions|TF1 Films Production|C...</td>\n",
+       "      <td>4/7/2004</td>\n",
+       "      <td>6.8</td>\n",
+       "      <td>2004</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "        imdb_id    budget    revenue       original_title  \\\n",
+       "1104  tt0332379  35000000  131282949   The School of Rock   \n",
+       "780   tt1622979  47000000  157887643  Final Destination 5   \n",
+       "642   tt0494238  60000000   57490374             Inkheart   \n",
+       "768   tt1449283  30000000   14460000      Winnie the Pooh   \n",
+       "1655  tt0338512  74500000   62172050         Deux frÃ¨res   \n",
+       "\n",
+       "                                                   cast  \\\n",
+       "1104  Jack Black|Joan Cusack|Mike White|Sarah Silver...   \n",
+       "780   Emma Bell|Nicholas D'Agosto|Miles Fisher|Ellen...   \n",
+       "642   Brendan Fraser|Sienna Guillory|Andy Serkis|Eli...   \n",
+       "768   Jim Cummings|Travis Oates|Jim Cummings|Bud Luc...   \n",
+       "1655  MaÃ¯ Anh Le|Guy Pearce|Oanh Nguyen|Jaran 'See ...   \n",
+       "\n",
+       "                       director  \\\n",
+       "1104          Richard Linklater   \n",
+       "780                Steven Quale   \n",
+       "642                Iain Softley   \n",
+       "768   Stephen Anderson|Don Hall   \n",
+       "1655        Jean-Jacques Annaud   \n",
+       "\n",
+       "                                                tagline  \\\n",
+       "1104     He just landed the gig of his life: 5th grade.   \n",
+       "780                  We all share a common destination.   \n",
+       "642   Every story ever written is just waiting to be...   \n",
+       "768                                            Oh Pooh.   \n",
+       "1655  Two infant tiger cubs, separated from their pa...   \n",
+       "\n",
+       "                                               overview  runtime  \\\n",
+       "1104  Fired from his band and hard up for cash, guit...      108   \n",
+       "780   In this fifth installment, Death is just as om...       92   \n",
+       "642   The adventures of a father and his young daugh...      106   \n",
+       "768   During an ordinary day in Hundred Acre Wood, W...       63   \n",
+       "1655  Two tigers are separated as cubs and taken int...      109   \n",
+       "\n",
+       "                        genres  \\\n",
+       "1104              Comedy|Music   \n",
+       "780             Horror|Mystery   \n",
+       "642   Adventure|Family|Fantasy   \n",
+       "768           Animation|Family   \n",
+       "1655    Adventure|Drama|Family   \n",
+       "\n",
+       "                                   production_companies release_date  \\\n",
+       "1104                                 Paramount Pictures    10/3/2003   \n",
+       "780    New Line Cinema|Practical Pictures|Parallel Zide    8/12/2011   \n",
+       "642   New Line Cinema|Internationale Filmproduktion ...   12/11/2008   \n",
+       "768   Walt Disney Pictures|Walt Disney Animation Stu...    4/13/2011   \n",
+       "1655  PathÃ© Renn Productions|TF1 Films Production|C...     4/7/2004   \n",
+       "\n",
+       "      vote_average  release_year  \n",
+       "1104           6.6          2003  \n",
+       "780            5.9          2011  \n",
+       "642            5.8          2008  \n",
+       "768            6.8          2011  \n",
+       "1655           6.8          2004  "
+      ]
+     },
+     "execution_count": 469,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data = pd.read_csv('movie_bd_v5.xls')\n",
+    "data.sample(5)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 470,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "CoYUnagMVp-C"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>budget</th>\n",
+       "      <th>revenue</th>\n",
+       "      <th>runtime</th>\n",
+       "      <th>vote_average</th>\n",
+       "      <th>release_year</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>count</th>\n",
+       "      <td>1.889000e+03</td>\n",
+       "      <td>1.889000e+03</td>\n",
+       "      <td>1889.000000</td>\n",
+       "      <td>1889.000000</td>\n",
+       "      <td>1889.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>mean</th>\n",
+       "      <td>5.431083e+07</td>\n",
+       "      <td>1.553653e+08</td>\n",
+       "      <td>109.658549</td>\n",
+       "      <td>6.140762</td>\n",
+       "      <td>2007.860773</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>std</th>\n",
+       "      <td>4.858721e+07</td>\n",
+       "      <td>2.146698e+08</td>\n",
+       "      <td>18.017041</td>\n",
+       "      <td>0.764763</td>\n",
+       "      <td>4.468841</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>min</th>\n",
+       "      <td>5.000000e+06</td>\n",
+       "      <td>2.033165e+06</td>\n",
+       "      <td>63.000000</td>\n",
+       "      <td>3.300000</td>\n",
+       "      <td>2000.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>25%</th>\n",
+       "      <td>2.000000e+07</td>\n",
+       "      <td>3.456058e+07</td>\n",
+       "      <td>97.000000</td>\n",
+       "      <td>5.600000</td>\n",
+       "      <td>2004.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>50%</th>\n",
+       "      <td>3.800000e+07</td>\n",
+       "      <td>8.361541e+07</td>\n",
+       "      <td>107.000000</td>\n",
+       "      <td>6.100000</td>\n",
+       "      <td>2008.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>75%</th>\n",
+       "      <td>7.200000e+07</td>\n",
+       "      <td>1.782626e+08</td>\n",
+       "      <td>120.000000</td>\n",
+       "      <td>6.600000</td>\n",
+       "      <td>2012.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>max</th>\n",
+       "      <td>3.800000e+08</td>\n",
+       "      <td>2.781506e+09</td>\n",
+       "      <td>214.000000</td>\n",
+       "      <td>8.100000</td>\n",
+       "      <td>2015.000000</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "             budget       revenue      runtime  vote_average  release_year\n",
+       "count  1.889000e+03  1.889000e+03  1889.000000   1889.000000   1889.000000\n",
+       "mean   5.431083e+07  1.553653e+08   109.658549      6.140762   2007.860773\n",
+       "std    4.858721e+07  2.146698e+08    18.017041      0.764763      4.468841\n",
+       "min    5.000000e+06  2.033165e+06    63.000000      3.300000   2000.000000\n",
+       "25%    2.000000e+07  3.456058e+07    97.000000      5.600000   2004.000000\n",
+       "50%    3.800000e+07  8.361541e+07   107.000000      6.100000   2008.000000\n",
+       "75%    7.200000e+07  1.782626e+08   120.000000      6.600000   2012.000000\n",
+       "max    3.800000e+08  2.781506e+09   214.000000      8.100000   2015.000000"
+      ]
+     },
+     "execution_count": 470,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data.describe()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "DTIt7ezGVp-G"
+   },
+   "source": [
+    "# Предобработка"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 471,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "jNb40DwKVp-H"
+   },
+   "outputs": [],
+   "source": [
+    "answers = {} # создадим словарь для ответов\n",
+    "\n",
+    "# тут другие ваши предобработки колонок например:\n",
+    "\n",
+    "#the time given in the dataset is in string format.\n",
+    "#So we need to change this in datetime format\n",
+    "#profit:\n",
+    "data['profit'] = (data['revenue'] - data['budget'])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "YxZaH-nPVp-L"
+   },
+   "source": [
+    "# 1. У какого фильма из списка самый большой бюджет?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "Nd-G5gX6Vp-M"
+   },
+   "source": [
+    "Использовать варианты ответов в коде решения запрещено.    \n",
+    "Вы думаете и в жизни у вас будут варианты ответов?)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 472,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "uVnXAY5RVp-O"
+   },
+   "outputs": [],
+   "source": [
+    "# в словарь вставляем номер вопроса и ваш ответ на него\n",
+    "# Пример: \n",
+    "answers['1'] = '2. Spider-Man 3 (tt0413300)'\n",
+    "# запишите свой вариант ответа"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 473,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "answers['1'] = '5. Pirates of the Caribbean: On Stranger Tides (tt1298650) ' #+\n",
+    "# если ответили верно, можете добавить комментарий со значком \"+\""
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 474,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "dZwb3m28Vp-S"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>imdb_id</th>\n",
+       "      <th>budget</th>\n",
+       "      <th>revenue</th>\n",
+       "      <th>original_title</th>\n",
+       "      <th>cast</th>\n",
+       "      <th>director</th>\n",
+       "      <th>tagline</th>\n",
+       "      <th>overview</th>\n",
+       "      <th>runtime</th>\n",
+       "      <th>genres</th>\n",
+       "      <th>production_companies</th>\n",
+       "      <th>release_date</th>\n",
+       "      <th>vote_average</th>\n",
+       "      <th>release_year</th>\n",
+       "      <th>profit</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>723</th>\n",
+       "      <td>tt1298650</td>\n",
+       "      <td>380000000</td>\n",
+       "      <td>1021683000</td>\n",
+       "      <td>Pirates of the Caribbean: On Stranger Tides</td>\n",
+       "      <td>Johnny Depp|PenÃ©lope Cruz|Geoffrey Rush|Ian M...</td>\n",
+       "      <td>Rob Marshall</td>\n",
+       "      <td>Live Forever Or Die Trying.</td>\n",
+       "      <td>Captain Jack Sparrow crosses paths with a woma...</td>\n",
+       "      <td>136</td>\n",
+       "      <td>Adventure|Action|Fantasy</td>\n",
+       "      <td>Walt Disney Pictures|Jerry Bruckheimer Films|M...</td>\n",
+       "      <td>5/11/2011</td>\n",
+       "      <td>6.3</td>\n",
+       "      <td>2011</td>\n",
+       "      <td>641683000</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "       imdb_id     budget     revenue  \\\n",
+       "723  tt1298650  380000000  1021683000   \n",
+       "\n",
+       "                                  original_title  \\\n",
+       "723  Pirates of the Caribbean: On Stranger Tides   \n",
+       "\n",
+       "                                                  cast      director  \\\n",
+       "723  Johnny Depp|PenÃ©lope Cruz|Geoffrey Rush|Ian M...  Rob Marshall   \n",
+       "\n",
+       "                         tagline  \\\n",
+       "723  Live Forever Or Die Trying.   \n",
+       "\n",
+       "                                              overview  runtime  \\\n",
+       "723  Captain Jack Sparrow crosses paths with a woma...      136   \n",
+       "\n",
+       "                       genres  \\\n",
+       "723  Adventure|Action|Fantasy   \n",
+       "\n",
+       "                                  production_companies release_date  \\\n",
+       "723  Walt Disney Pictures|Jerry Bruckheimer Films|M...    5/11/2011   \n",
+       "\n",
+       "     vote_average  release_year     profit  \n",
+       "723           6.3          2011  641683000  "
+      ]
+     },
+     "execution_count": 474,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# тут пишем ваш код для решения данного вопроса:\n",
+    "data.loc[data['budget']==data.budget.max()] "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "K7L3nbRXVp-X"
+   },
+   "source": [
+    "ВАРИАНТ 2"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 475,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "OGaoQI7rVp-X"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>imdb_id</th>\n",
+       "      <th>budget</th>\n",
+       "      <th>revenue</th>\n",
+       "      <th>original_title</th>\n",
+       "      <th>cast</th>\n",
+       "      <th>director</th>\n",
+       "      <th>tagline</th>\n",
+       "      <th>overview</th>\n",
+       "      <th>runtime</th>\n",
+       "      <th>genres</th>\n",
+       "      <th>production_companies</th>\n",
+       "      <th>release_date</th>\n",
+       "      <th>vote_average</th>\n",
+       "      <th>release_year</th>\n",
+       "      <th>profit</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>723</th>\n",
+       "      <td>tt1298650</td>\n",
+       "      <td>380000000</td>\n",
+       "      <td>1021683000</td>\n",
+       "      <td>Pirates of the Caribbean: On Stranger Tides</td>\n",
+       "      <td>Johnny Depp|PenÃ©lope Cruz|Geoffrey Rush|Ian M...</td>\n",
+       "      <td>Rob Marshall</td>\n",
+       "      <td>Live Forever Or Die Trying.</td>\n",
+       "      <td>Captain Jack Sparrow crosses paths with a woma...</td>\n",
+       "      <td>136</td>\n",
+       "      <td>Adventure|Action|Fantasy</td>\n",
+       "      <td>Walt Disney Pictures|Jerry Bruckheimer Films|M...</td>\n",
+       "      <td>5/11/2011</td>\n",
+       "      <td>6.3</td>\n",
+       "      <td>2011</td>\n",
+       "      <td>641683000</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "       imdb_id     budget     revenue  \\\n",
+       "723  tt1298650  380000000  1021683000   \n",
+       "\n",
+       "                                  original_title  \\\n",
+       "723  Pirates of the Caribbean: On Stranger Tides   \n",
+       "\n",
+       "                                                  cast      director  \\\n",
+       "723  Johnny Depp|PenÃ©lope Cruz|Geoffrey Rush|Ian M...  Rob Marshall   \n",
+       "\n",
+       "                         tagline  \\\n",
+       "723  Live Forever Or Die Trying.   \n",
+       "\n",
+       "                                              overview  runtime  \\\n",
+       "723  Captain Jack Sparrow crosses paths with a woma...      136   \n",
+       "\n",
+       "                       genres  \\\n",
+       "723  Adventure|Action|Fantasy   \n",
+       "\n",
+       "                                  production_companies release_date  \\\n",
+       "723  Walt Disney Pictures|Jerry Bruckheimer Films|M...    5/11/2011   \n",
+       "\n",
+       "     vote_average  release_year     profit  \n",
+       "723           6.3          2011  641683000  "
+      ]
+     },
+     "execution_count": 475,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# можно добавлять разные варианты решения\n",
+    "data[data.budget == data.budget.max()]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "FNRbbI3vVp-c"
+   },
+   "source": [
+    "# 2. Какой из фильмов самый длительный (в минутах)?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 476,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "vHAoEXNTVp-d"
+   },
+   "outputs": [],
+   "source": [
+    "# думаю логику работы с этим словарем вы уже поняли, \n",
+    "# по этому не буду больше его дублировать"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 477,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "answers['2'] = '2. Gods and Generals (tt0279111)' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 478,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "ot-VX2XrVp-g"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>imdb_id</th>\n",
+       "      <th>budget</th>\n",
+       "      <th>revenue</th>\n",
+       "      <th>original_title</th>\n",
+       "      <th>cast</th>\n",
+       "      <th>director</th>\n",
+       "      <th>tagline</th>\n",
+       "      <th>overview</th>\n",
+       "      <th>runtime</th>\n",
+       "      <th>genres</th>\n",
+       "      <th>production_companies</th>\n",
+       "      <th>release_date</th>\n",
+       "      <th>vote_average</th>\n",
+       "      <th>release_year</th>\n",
+       "      <th>profit</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>1157</th>\n",
+       "      <td>tt0279111</td>\n",
+       "      <td>56000000</td>\n",
+       "      <td>12923936</td>\n",
+       "      <td>Gods and Generals</td>\n",
+       "      <td>Stephen Lang|Jeff Daniels|Robert Duvall|Kevin ...</td>\n",
+       "      <td>Ronald F. Maxwell</td>\n",
+       "      <td>The nations heart was touched by...</td>\n",
+       "      <td>The film centers mostly around the personal an...</td>\n",
+       "      <td>214</td>\n",
+       "      <td>Drama|History|War</td>\n",
+       "      <td>Turner Pictures|Antietam Filmworks</td>\n",
+       "      <td>2/21/2003</td>\n",
+       "      <td>5.8</td>\n",
+       "      <td>2003</td>\n",
+       "      <td>-43076064</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "        imdb_id    budget   revenue     original_title  \\\n",
+       "1157  tt0279111  56000000  12923936  Gods and Generals   \n",
+       "\n",
+       "                                                   cast           director  \\\n",
+       "1157  Stephen Lang|Jeff Daniels|Robert Duvall|Kevin ...  Ronald F. Maxwell   \n",
+       "\n",
+       "                                  tagline  \\\n",
+       "1157  The nations heart was touched by...   \n",
+       "\n",
+       "                                               overview  runtime  \\\n",
+       "1157  The film centers mostly around the personal an...      214   \n",
+       "\n",
+       "                 genres                production_companies release_date  \\\n",
+       "1157  Drama|History|War  Turner Pictures|Antietam Filmworks    2/21/2003   \n",
+       "\n",
+       "      vote_average  release_year    profit  \n",
+       "1157           5.8          2003 -43076064  "
+      ]
+     },
+     "execution_count": 478,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data.loc[data['runtime']==data.runtime.max()]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "bapLlpW8Vp-k"
+   },
+   "source": [
+    "# 3. Какой из фильмов самый короткий (в минутах)?\n",
+    "\n",
+    "\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 479,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "YBxaSHuAVp-l"
+   },
+   "outputs": [],
+   "source": [
+    "answers['3'] ='3. Winnie the Pooh (tt1449283) ' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 480,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>imdb_id</th>\n",
+       "      <th>budget</th>\n",
+       "      <th>revenue</th>\n",
+       "      <th>original_title</th>\n",
+       "      <th>cast</th>\n",
+       "      <th>director</th>\n",
+       "      <th>tagline</th>\n",
+       "      <th>overview</th>\n",
+       "      <th>runtime</th>\n",
+       "      <th>genres</th>\n",
+       "      <th>production_companies</th>\n",
+       "      <th>release_date</th>\n",
+       "      <th>vote_average</th>\n",
+       "      <th>release_year</th>\n",
+       "      <th>profit</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>768</th>\n",
+       "      <td>tt1449283</td>\n",
+       "      <td>30000000</td>\n",
+       "      <td>14460000</td>\n",
+       "      <td>Winnie the Pooh</td>\n",
+       "      <td>Jim Cummings|Travis Oates|Jim Cummings|Bud Luc...</td>\n",
+       "      <td>Stephen Anderson|Don Hall</td>\n",
+       "      <td>Oh Pooh.</td>\n",
+       "      <td>During an ordinary day in Hundred Acre Wood, W...</td>\n",
+       "      <td>63</td>\n",
+       "      <td>Animation|Family</td>\n",
+       "      <td>Walt Disney Pictures|Walt Disney Animation Stu...</td>\n",
+       "      <td>4/13/2011</td>\n",
+       "      <td>6.8</td>\n",
+       "      <td>2011</td>\n",
+       "      <td>-15540000</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "       imdb_id    budget   revenue   original_title  \\\n",
+       "768  tt1449283  30000000  14460000  Winnie the Pooh   \n",
+       "\n",
+       "                                                  cast  \\\n",
+       "768  Jim Cummings|Travis Oates|Jim Cummings|Bud Luc...   \n",
+       "\n",
+       "                      director   tagline  \\\n",
+       "768  Stephen Anderson|Don Hall  Oh Pooh.   \n",
+       "\n",
+       "                                              overview  runtime  \\\n",
+       "768  During an ordinary day in Hundred Acre Wood, W...       63   \n",
+       "\n",
+       "               genres                               production_companies  \\\n",
+       "768  Animation|Family  Walt Disney Pictures|Walt Disney Animation Stu...   \n",
+       "\n",
+       "    release_date  vote_average  release_year    profit  \n",
+       "768    4/13/2011           6.8          2011 -15540000  "
+      ]
+     },
+     "execution_count": 480,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data.loc[data['runtime']==data.runtime.min()]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "TfQbxbfNVp-p"
+   },
+   "source": [
+    "# 4. Какова средняя длительность фильмов?\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 481,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "5K6dKZYVVp-q"
+   },
+   "outputs": [],
+   "source": [
+    "answers['4'] = '2. 110' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 482,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "110"
+      ]
+     },
+     "execution_count": 482,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "round(data['runtime'].mean()) "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "r5TvbnT_Vp-u"
+   },
+   "source": [
+    "# 5. Каково медианное значение длительности фильмов? "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 483,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "iBROplKnVp-v"
+   },
+   "outputs": [],
+   "source": [
+    "answers['5'] = '1. 107' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 484,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "107.0"
+      ]
+     },
+     "execution_count": 484,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data['runtime'].median()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "39P-deDSVp-y"
+   },
+   "source": [
+    "# 6. Какой самый прибыльный фильм?\n",
+    "#### Внимание! Здесь и далее под «прибылью» или «убытками» понимается разность между сборами и бюджетом фильма. (прибыль = сборы - бюджет) в нашем датасете это будет (profit = revenue - budget) "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 485,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "UYZh4T9WVp-y"
+   },
+   "outputs": [],
+   "source": [
+    "# лучше код получения столбца profit вынести в Предобработку что в начале"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 486,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "answers['6'] = '5. Avatar (tt0499549)' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 487,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>imdb_id</th>\n",
+       "      <th>budget</th>\n",
+       "      <th>revenue</th>\n",
+       "      <th>original_title</th>\n",
+       "      <th>cast</th>\n",
+       "      <th>director</th>\n",
+       "      <th>tagline</th>\n",
+       "      <th>overview</th>\n",
+       "      <th>runtime</th>\n",
+       "      <th>genres</th>\n",
+       "      <th>production_companies</th>\n",
+       "      <th>release_date</th>\n",
+       "      <th>vote_average</th>\n",
+       "      <th>release_year</th>\n",
+       "      <th>profit</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>239</th>\n",
+       "      <td>tt0499549</td>\n",
+       "      <td>237000000</td>\n",
+       "      <td>2781505847</td>\n",
+       "      <td>Avatar</td>\n",
+       "      <td>Sam Worthington|Zoe Saldana|Sigourney Weaver|S...</td>\n",
+       "      <td>James Cameron</td>\n",
+       "      <td>Enter the World of Pandora.</td>\n",
+       "      <td>In the 22nd century, a paraplegic Marine is di...</td>\n",
+       "      <td>162</td>\n",
+       "      <td>Action|Adventure|Fantasy|Science Fiction</td>\n",
+       "      <td>Ingenious Film Partners|Twentieth Century Fox ...</td>\n",
+       "      <td>12/10/2009</td>\n",
+       "      <td>7.1</td>\n",
+       "      <td>2009</td>\n",
+       "      <td>2544505847</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "       imdb_id     budget     revenue original_title  \\\n",
+       "239  tt0499549  237000000  2781505847         Avatar   \n",
+       "\n",
+       "                                                  cast       director  \\\n",
+       "239  Sam Worthington|Zoe Saldana|Sigourney Weaver|S...  James Cameron   \n",
+       "\n",
+       "                         tagline  \\\n",
+       "239  Enter the World of Pandora.   \n",
+       "\n",
+       "                                              overview  runtime  \\\n",
+       "239  In the 22nd century, a paraplegic Marine is di...      162   \n",
+       "\n",
+       "                                       genres  \\\n",
+       "239  Action|Adventure|Fantasy|Science Fiction   \n",
+       "\n",
+       "                                  production_companies release_date  \\\n",
+       "239  Ingenious Film Partners|Twentieth Century Fox ...   12/10/2009   \n",
+       "\n",
+       "     vote_average  release_year      profit  \n",
+       "239           7.1          2009  2544505847  "
+      ]
+     },
+     "execution_count": 487,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data[data['profit']==data['profit'].max()]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "M99JmIX4Vp-2"
+   },
+   "source": [
+    "# 7. Какой фильм самый убыточный? "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 488,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "w-D2m4XPVp-3"
+   },
+   "outputs": [],
+   "source": [
+    "answers['7'] = '5.The Lone Ranger (tt1210819)' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 489,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>imdb_id</th>\n",
+       "      <th>budget</th>\n",
+       "      <th>revenue</th>\n",
+       "      <th>original_title</th>\n",
+       "      <th>cast</th>\n",
+       "      <th>director</th>\n",
+       "      <th>tagline</th>\n",
+       "      <th>overview</th>\n",
+       "      <th>runtime</th>\n",
+       "      <th>genres</th>\n",
+       "      <th>production_companies</th>\n",
+       "      <th>release_date</th>\n",
+       "      <th>vote_average</th>\n",
+       "      <th>release_year</th>\n",
+       "      <th>profit</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>1245</th>\n",
+       "      <td>tt1210819</td>\n",
+       "      <td>255000000</td>\n",
+       "      <td>89289910</td>\n",
+       "      <td>The Lone Ranger</td>\n",
+       "      <td>Johnny Depp|Armie Hammer|William Fichtner|Hele...</td>\n",
+       "      <td>Gore Verbinski</td>\n",
+       "      <td>Never Take Off the Mask</td>\n",
+       "      <td>The Texas Rangers chase down a gang of outlaws...</td>\n",
+       "      <td>149</td>\n",
+       "      <td>Action|Adventure|Western</td>\n",
+       "      <td>Walt Disney Pictures|Jerry Bruckheimer Films|I...</td>\n",
+       "      <td>7/3/2013</td>\n",
+       "      <td>6.0</td>\n",
+       "      <td>2013</td>\n",
+       "      <td>-165710090</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "        imdb_id     budget   revenue   original_title  \\\n",
+       "1245  tt1210819  255000000  89289910  The Lone Ranger   \n",
+       "\n",
+       "                                                   cast        director  \\\n",
+       "1245  Johnny Depp|Armie Hammer|William Fichtner|Hele...  Gore Verbinski   \n",
+       "\n",
+       "                      tagline  \\\n",
+       "1245  Never Take Off the Mask   \n",
+       "\n",
+       "                                               overview  runtime  \\\n",
+       "1245  The Texas Rangers chase down a gang of outlaws...      149   \n",
+       "\n",
+       "                        genres  \\\n",
+       "1245  Action|Adventure|Western   \n",
+       "\n",
+       "                                   production_companies release_date  \\\n",
+       "1245  Walt Disney Pictures|Jerry Bruckheimer Films|I...     7/3/2013   \n",
+       "\n",
+       "      vote_average  release_year     profit  \n",
+       "1245           6.0          2013 -165710090  "
+      ]
+     },
+     "execution_count": 489,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data[data['profit']==data['profit'].min()]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "wEOM5ERVVp-6"
+   },
+   "source": [
+    "# 8. У скольких фильмов из датасета объем сборов оказался выше бюджета?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 490,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "answers['8'] = '1. 1478' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 491,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "y00_7HD6Vp-7"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "1478"
+      ]
+     },
+     "execution_count": 491,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "len(data[data['revenue']>data['budget']])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "xhpspA9KVp_A"
+   },
+   "source": [
+    "# 9. Какой фильм оказался самым кассовым в 2008 году?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 492,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "answers['9'] = '4. The Dark Knight (tt0468569)' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 493,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>imdb_id</th>\n",
+       "      <th>budget</th>\n",
+       "      <th>revenue</th>\n",
+       "      <th>original_title</th>\n",
+       "      <th>cast</th>\n",
+       "      <th>director</th>\n",
+       "      <th>tagline</th>\n",
+       "      <th>overview</th>\n",
+       "      <th>runtime</th>\n",
+       "      <th>genres</th>\n",
+       "      <th>production_companies</th>\n",
+       "      <th>release_date</th>\n",
+       "      <th>vote_average</th>\n",
+       "      <th>release_year</th>\n",
+       "      <th>profit</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>599</th>\n",
+       "      <td>tt0468569</td>\n",
+       "      <td>185000000</td>\n",
+       "      <td>1001921825</td>\n",
+       "      <td>The Dark Knight</td>\n",
+       "      <td>Christian Bale|Michael Caine|Heath Ledger|Aaro...</td>\n",
+       "      <td>Christopher Nolan</td>\n",
+       "      <td>Why So Serious?</td>\n",
+       "      <td>Batman raises the stakes in his war on crime. ...</td>\n",
+       "      <td>152</td>\n",
+       "      <td>Drama|Action|Crime|Thriller</td>\n",
+       "      <td>DC Comics|Legendary Pictures|Warner Bros.|Syncopy</td>\n",
+       "      <td>7/16/2008</td>\n",
+       "      <td>8.1</td>\n",
+       "      <td>2008</td>\n",
+       "      <td>816921825</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "       imdb_id     budget     revenue   original_title  \\\n",
+       "599  tt0468569  185000000  1001921825  The Dark Knight   \n",
+       "\n",
+       "                                                  cast           director  \\\n",
+       "599  Christian Bale|Michael Caine|Heath Ledger|Aaro...  Christopher Nolan   \n",
+       "\n",
+       "             tagline                                           overview  \\\n",
+       "599  Why So Serious?  Batman raises the stakes in his war on crime. ...   \n",
+       "\n",
+       "     runtime                       genres  \\\n",
+       "599      152  Drama|Action|Crime|Thriller   \n",
+       "\n",
+       "                                  production_companies release_date  \\\n",
+       "599  DC Comics|Legendary Pictures|Warner Bros.|Syncopy    7/16/2008   \n",
+       "\n",
+       "     vote_average  release_year     profit  \n",
+       "599           8.1          2008  816921825  "
+      ]
+     },
+     "execution_count": 493,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data[data['revenue']==data[(data.release_year == 2008)].revenue.max()]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "Zi4hDKidVp_F"
+   },
+   "source": [
+    "# 10. Самый убыточный фильм за период с 2012 по 2014 г. (включительно)?\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 494,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "answers['10'] = '5.The Lone Ranger (tt1210819)' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 495,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "XqyRmufJVp_F"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>imdb_id</th>\n",
+       "      <th>budget</th>\n",
+       "      <th>revenue</th>\n",
+       "      <th>original_title</th>\n",
+       "      <th>cast</th>\n",
+       "      <th>director</th>\n",
+       "      <th>tagline</th>\n",
+       "      <th>overview</th>\n",
+       "      <th>runtime</th>\n",
+       "      <th>genres</th>\n",
+       "      <th>production_companies</th>\n",
+       "      <th>release_date</th>\n",
+       "      <th>vote_average</th>\n",
+       "      <th>release_year</th>\n",
+       "      <th>profit</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>1245</th>\n",
+       "      <td>tt1210819</td>\n",
+       "      <td>255000000</td>\n",
+       "      <td>89289910</td>\n",
+       "      <td>The Lone Ranger</td>\n",
+       "      <td>Johnny Depp|Armie Hammer|William Fichtner|Hele...</td>\n",
+       "      <td>Gore Verbinski</td>\n",
+       "      <td>Never Take Off the Mask</td>\n",
+       "      <td>The Texas Rangers chase down a gang of outlaws...</td>\n",
+       "      <td>149</td>\n",
+       "      <td>Action|Adventure|Western</td>\n",
+       "      <td>Walt Disney Pictures|Jerry Bruckheimer Films|I...</td>\n",
+       "      <td>7/3/2013</td>\n",
+       "      <td>6.0</td>\n",
+       "      <td>2013</td>\n",
+       "      <td>-165710090</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "        imdb_id     budget   revenue   original_title  \\\n",
+       "1245  tt1210819  255000000  89289910  The Lone Ranger   \n",
+       "\n",
+       "                                                   cast        director  \\\n",
+       "1245  Johnny Depp|Armie Hammer|William Fichtner|Hele...  Gore Verbinski   \n",
+       "\n",
+       "                      tagline  \\\n",
+       "1245  Never Take Off the Mask   \n",
+       "\n",
+       "                                               overview  runtime  \\\n",
+       "1245  The Texas Rangers chase down a gang of outlaws...      149   \n",
+       "\n",
+       "                        genres  \\\n",
+       "1245  Action|Adventure|Western   \n",
+       "\n",
+       "                                   production_companies release_date  \\\n",
+       "1245  Walt Disney Pictures|Jerry Bruckheimer Films|I...     7/3/2013   \n",
+       "\n",
+       "      vote_average  release_year     profit  \n",
+       "1245           6.0          2013 -165710090  "
+      ]
+     },
+     "execution_count": 495,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data[data['profit']==data[(data.release_year>=2012) & (data.release_year<=2014)].profit.min()]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "EA7Sa9dkVp_I"
+   },
+   "source": [
+    "# 11. Какого жанра фильмов больше всего?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 496,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "answers['11'] = '3. Drama' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 497,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Drama              782\n",
+       "Comedy             683\n",
+       "Thriller           596\n",
+       "Action             582\n",
+       "Adventure          415\n",
+       "Crime              315\n",
+       "Romance            308\n",
+       "Family             260\n",
+       "Science Fiction    248\n",
+       "Fantasy            222\n",
+       "Horror             176\n",
+       "Mystery            168\n",
+       "Animation          139\n",
+       "Music               64\n",
+       "History             62\n",
+       "War                 58\n",
+       "Western             19\n",
+       "Documentary          8\n",
+       "Foreign              2\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 497,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data = pd.read_csv('movie_bd_v5.xls')\n",
+    "\n",
+    "pd.Series(data['genres'].str.cat(sep='|').split('|')).value_counts() #создадим серию и подсчитаем количество жанров"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "Ax6g2C8SVp_M"
+   },
+   "source": [
+    "ВАРИАНТ 2"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 498,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Drama              782\n",
+       "Comedy             683\n",
+       "Thriller           596\n",
+       "Action             582\n",
+       "Adventure          415\n",
+       "Crime              315\n",
+       "Romance            308\n",
+       "Family             260\n",
+       "Science Fiction    248\n",
+       "Fantasy            222\n",
+       "Horror             176\n",
+       "Mystery            168\n",
+       "Animation          139\n",
+       "Music               64\n",
+       "History             62\n",
+       "War                 58\n",
+       "Western             19\n",
+       "Documentary          8\n",
+       "Foreign              2\n",
+       "Name: genres, dtype: int64"
+      ]
+     },
+     "execution_count": 498,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data = pd.read_csv('movie_bd_v5.xls')\n",
+    "data['genres']=data.genres.apply(lambda x: x.split('|')) \n",
+    "data=data.explode('genres') #разделим кажнры по одному\n",
+    "data['genres'].value_counts()\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "T9_bPWpkVp_Q"
+   },
+   "source": [
+    "# 12. Фильмы какого жанра чаще всего становятся прибыльными? "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 499,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "answers['12'] = '1. Drama' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 500,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Drama              560\n",
+       "Comedy             551\n",
+       "Thriller           446\n",
+       "Action             444\n",
+       "Adventure          337\n",
+       "Romance            242\n",
+       "Crime              231\n",
+       "Family             226\n",
+       "Science Fiction    195\n",
+       "Fantasy            188\n",
+       "Horror             150\n",
+       "Animation          120\n",
+       "Mystery            119\n",
+       "Music               47\n",
+       "History             46\n",
+       "War                 41\n",
+       "Western             12\n",
+       "Documentary          7\n",
+       "Name: genres, dtype: int64"
+      ]
+     },
+     "execution_count": 500,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data = pd.read_csv('movie_bd_v5.xls')\n",
+    "data['profit'] = (data['revenue'] - data['budget']) #создадим колонку содержащую прибыль\n",
+    "data['genres']=data.genres.apply(lambda x: x.split('|'))\n",
+    "data=data.explode('genres')#разложим жанры отдельно каждый\n",
+    "data=data[data['profit']>0] \n",
+    "data['genres'].value_counts()\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "0F23bgsDVp_U"
+   },
+   "source": [
+    "# 13. У какого режиссера самые большие суммарные кассовые сбооры?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 501,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "answers['13'] = '5. Peter Jackson' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 502,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "director\n",
+       "Peter Jackson        6490593685\n",
+       "Christopher Nolan    4167548502\n",
+       "David Yates          4154295625\n",
+       "Michael Bay          3886938960\n",
+       "J.J. Abrams          3579169916\n",
+       "                        ...    \n",
+       "David MichÃ´d           2295423\n",
+       "Steven Shainberg        2281089\n",
+       "Paul Schrader           2062066\n",
+       "Keanu Reeves            2054941\n",
+       "Simon Hunter            2033165\n",
+       "Name: revenue, Length: 957, dtype: int64"
+      ]
+     },
+     "execution_count": 502,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data = pd.read_csv('movie_bd_v5.xls')\n",
+    "data['director'].str.cat(sep='|').split('|') \n",
+    "pd.Series(data['director'].str.cat(sep='|').split('|')).value_counts()#разделим режиссеров\n",
+    "data.groupby(['director'])['revenue'].sum().sort_values(ascending=False)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 503,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "director\n",
+       "Peter Jackson        6490593685\n",
+       "Christopher Nolan    4167548502\n",
+       "David Yates          4154295625\n",
+       "Michael Bay          3886938960\n",
+       "J.J. Abrams          3579169916\n",
+       "                        ...    \n",
+       "David MichÃ´d           2295423\n",
+       "Steven Shainberg        2281089\n",
+       "Paul Schrader           2062066\n",
+       "Keanu Reeves            2054941\n",
+       "Simon Hunter            2033165\n",
+       "Name: revenue, Length: 997, dtype: int64"
+      ]
+     },
+     "execution_count": 503,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "#ВАРИАНТ2\n",
+    "data = pd.read_csv('movie_bd_v5.xls')\n",
+    "data['director']=data.director.apply(lambda x: x.split('|'))\n",
+    "data=data.explode('director')\n",
+    "data.groupby(['director'])['revenue'].sum().sort_values(ascending=False)\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "PsYC9FgRVp_a"
+   },
+   "source": [
+    "# 14. Какой режисер снял больше всего фильмов в стиле Action?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 504,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "wd2M-wHeVp_b"
+   },
+   "outputs": [],
+   "source": [
+    "answers['14'] = '3. Robert Rodriguez' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 505,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "director\n",
+       "Robert Rodriguez      9\n",
+       "Michael Bay           7\n",
+       "Paul W.S. Anderson    7\n",
+       "Antoine Fuqua         6\n",
+       "Ridley Scott          6\n",
+       "                     ..\n",
+       "Vic Armstrong         1\n",
+       "Vicky Jenson          1\n",
+       "Wayne Kramer          1\n",
+       "Wolfgang Petersen     1\n",
+       "Xavier Gens           1\n",
+       "Name: director, Length: 364, dtype: int64"
+      ]
+     },
+     "execution_count": 505,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data = pd.read_csv('movie_bd_v5.xls')\n",
+    "data['genres']=data.genres.apply(lambda x: x.split('|'))\n",
+    "data=data.explode('genres') #разложили жанры по одному \n",
+    "data['director']=data.director.apply(lambda x: x.split('|'))\n",
+    "data=data.explode('director')#разложили режиссеров \n",
+    "data.groupby('genres')['director'].value_counts().loc['Action']"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "PQ0KciD7Vp_f"
+   },
+   "source": [
+    "# 15. Фильмы с каким актером принесли самые высокие кассовые сборы в 2012 году? "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 506,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "answers['15'] = '3. Chris Hemsworth' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 507,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "cast\n",
+       "Chris Hemsworth      2027450773\n",
+       "Denis Leary          1629460639\n",
+       "Anne Hathaway        1522851057\n",
+       "Chris Evans          1519557910\n",
+       "Robert Downey Jr.    1519557910\n",
+       "                        ...    \n",
+       "Jason Bateman           3428048\n",
+       "Danny Huston            2106557\n",
+       "Sami Gayle              2106557\n",
+       "Josh Lucas              2106557\n",
+       "Nicolas Cage            2106557\n",
+       "Name: revenue, Length: 466, dtype: int64"
+      ]
+     },
+     "execution_count": 507,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data = pd.read_csv('movie_bd_v5.xls')\n",
+    "data['cast']=data.cast.apply(lambda x: x.split('|'))\n",
+    "data=data.explode('cast') #разложили актеров по одному \n",
+    "data=data[data['release_year']==2012] #отфильтровали по заданному году\n",
+    "data.groupby(['cast'])['revenue'].sum().sort_values(ascending=False)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "mWHyyL7QVp_j"
+   },
+   "source": [
+    "# 16. Какой актер снялся в большем количестве высокобюджетных фильмов?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 508,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "answers['16'] = '3. Matt Damon' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 509,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "qQtmHKTFVp_k"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Matt Damon           18\n",
+       "Adam Sandler         17\n",
+       "Angelina Jolie       16\n",
+       "Tom Cruise           15\n",
+       "Eddie Murphy         15\n",
+       "                     ..\n",
+       "Michael Stuhlbarg     1\n",
+       "John Finn             1\n",
+       "Judy Greer            1\n",
+       "James Karen           1\n",
+       "Corey Burton          1\n",
+       "Name: cast, Length: 1505, dtype: int64"
+      ]
+     },
+     "execution_count": 509,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data = pd.read_csv('movie_bd_v5.xls')\n",
+    "data['cast']=data.cast.apply(lambda x: x.split('|'))\n",
+    "data=data.explode('cast') #разбили актеров по одному на каждый фильм\n",
+    "data=data[data['budget']>data.budget.mean()] #отфильтровали по высокобюджетным фильмам\n",
+    "data['cast'].value_counts() #подсчитали количество высокобюджетных фильмов для каждого актера"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "NIh6AaW5Vp_n"
+   },
+   "source": [
+    "# 17. В фильмах какого жанра больше всего снимался Nicolas Cage? "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 510,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "answers['17'] = '1. Drama' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 511,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "H74SJDIBVp_n"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Action             17\n",
+       "Thriller           15\n",
+       "Drama              12\n",
+       "Crime              10\n",
+       "Fantasy             8\n",
+       "Adventure           7\n",
+       "Comedy              6\n",
+       "Science Fiction     4\n",
+       "Family              3\n",
+       "Mystery             3\n",
+       "Animation           3\n",
+       "History             2\n",
+       "Romance             1\n",
+       "War                 1\n",
+       "Horror              1\n",
+       "Name: genres, dtype: int64"
+      ]
+     },
+     "execution_count": 511,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data = pd.read_csv('movie_bd_v5.xls')\n",
+    "data['genres']=data.genres.apply(lambda x:x.split('|'))\n",
+    "data=data.explode('genres')\n",
+    "data1=data[data.cast.str.contains('Nicolas Cage',na=False)] \n",
+    "data1['genres'].value_counts()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "RqOmPRfWVp_q"
+   },
+   "source": [
+    "# 18. Самый убыточный фильм от Paramount Pictures"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 512,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "answers['18'] = '1. K-19: The Widowmaker (tt0267626)' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 513,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "9E_B0Y96Vp_r"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>imdb_id</th>\n",
+       "      <th>budget</th>\n",
+       "      <th>revenue</th>\n",
+       "      <th>original_title</th>\n",
+       "      <th>cast</th>\n",
+       "      <th>director</th>\n",
+       "      <th>tagline</th>\n",
+       "      <th>overview</th>\n",
+       "      <th>runtime</th>\n",
+       "      <th>genres</th>\n",
+       "      <th>production_companies</th>\n",
+       "      <th>release_date</th>\n",
+       "      <th>vote_average</th>\n",
+       "      <th>release_year</th>\n",
+       "      <th>profit</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>925</th>\n",
+       "      <td>tt0267626</td>\n",
+       "      <td>100000000</td>\n",
+       "      <td>35168966</td>\n",
+       "      <td>K-19: The Widowmaker</td>\n",
+       "      <td>Harrison Ford|Liam Neeson|Peter Sarsgaard|Joss...</td>\n",
+       "      <td>Kathryn Bigelow</td>\n",
+       "      <td>Fate has found its hero.</td>\n",
+       "      <td>When Russia's first nuclear submarine malfunct...</td>\n",
+       "      <td>138</td>\n",
+       "      <td>Thriller|Drama|History</td>\n",
+       "      <td>Paramount Pictures|Intermedia Films|National G...</td>\n",
+       "      <td>7/19/2002</td>\n",
+       "      <td>6.0</td>\n",
+       "      <td>2002</td>\n",
+       "      <td>-64831034</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "       imdb_id     budget   revenue        original_title  \\\n",
+       "925  tt0267626  100000000  35168966  K-19: The Widowmaker   \n",
+       "\n",
+       "                                                  cast         director  \\\n",
+       "925  Harrison Ford|Liam Neeson|Peter Sarsgaard|Joss...  Kathryn Bigelow   \n",
+       "\n",
+       "                      tagline  \\\n",
+       "925  Fate has found its hero.   \n",
+       "\n",
+       "                                              overview  runtime  \\\n",
+       "925  When Russia's first nuclear submarine malfunct...      138   \n",
+       "\n",
+       "                     genres  \\\n",
+       "925  Thriller|Drama|History   \n",
+       "\n",
+       "                                  production_companies release_date  \\\n",
+       "925  Paramount Pictures|Intermedia Films|National G...    7/19/2002   \n",
+       "\n",
+       "     vote_average  release_year    profit  \n",
+       "925           6.0          2002 -64831034  "
+      ]
+     },
+     "execution_count": 513,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data = pd.read_csv('movie_bd_v5.xls')\n",
+    "data['profit'] = (data['revenue'] - data['budget'])\n",
+    "data_company=data[data.production_companies.str.contains('Paramount Pictures',na=False)] #оставили только фильмы от Paramount Pictures\n",
+    "data_company[data_company['profit']==data_company['profit'].min()]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "vS8Ur6ddVp_u"
+   },
+   "source": [
+    "# 19. Какой год стал самым успешным по суммарным кассовым сборам?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 514,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "answers['19'] = '5. 2015' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 515,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "Dnbt4GdIVp_v"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "release_year\n",
+       "2015    25449202382\n",
+       "2014    23405862953\n",
+       "2013    23213799791\n",
+       "2012    23079001687\n",
+       "2011    22676791872\n",
+       "2010    21071204961\n",
+       "2009    20261791024\n",
+       "2008    18252781990\n",
+       "2007    18162406801\n",
+       "2004    15663430720\n",
+       "2005    15309425558\n",
+       "2006    14775042320\n",
+       "2003    14346123312\n",
+       "2002    14136361487\n",
+       "2001    13017764865\n",
+       "2000    10664099805\n",
+       "Name: revenue, dtype: int64"
+      ]
+     },
+     "execution_count": 515,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data = pd.read_csv('movie_bd_v5.xls')\n",
+    "data.groupby(['release_year'])['revenue'].sum().sort_values(ascending=False)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "JAzJh4QAVp_z"
+   },
+   "source": [
+    "# 20. Какой самый прибыльный год для студии Warner Bros?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 516,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "wgVu02DEVp_0"
+   },
+   "outputs": [],
+   "source": [
+    "answers['20'] = '1. 2014' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 517,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "release_year\n",
+       "2014    2295464519\n",
+       "2007    2201675217\n",
+       "2008    2134595031\n",
+       "2010    1974712985\n",
+       "2011    1871393682\n",
+       "2003    1855493377\n",
+       "2009    1822454136\n",
+       "2013    1636453400\n",
+       "2004    1631933725\n",
+       "2005    1551980298\n",
+       "2001    1343545668\n",
+       "2012    1258020056\n",
+       "2002    1022709901\n",
+       "2015     870368348\n",
+       "2006     620170743\n",
+       "2000     452631386\n",
+       "Name: profit, dtype: int64"
+      ]
+     },
+     "execution_count": 517,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data = pd.read_csv('movie_bd_v5.xls')\n",
+    "data['profit'] = (data['revenue'] - data['budget'])\n",
+    "data_company=data[data.production_companies.str.contains('Warner Bros')] #оставили значения,которые содержат только Warner Bros\n",
+    "data_company.groupby('release_year')['profit'].sum().sort_values(ascending=False)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "8Im1S2HRVp_4"
+   },
+   "source": [
+    "# 21. В каком месяце за все годы суммарно вышло больше всего фильмов?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 518,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "lev6TH7gVp_4"
+   },
+   "outputs": [],
+   "source": [
+    "answers['21'] = '4. Сентябрь' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 519,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "9     227\n",
+       "12    190\n",
+       "10    186\n",
+       "8     161\n",
+       "3     156\n",
+       "4     149\n",
+       "6     147\n",
+       "11    146\n",
+       "7     142\n",
+       "5     140\n",
+       "2     135\n",
+       "1     110\n",
+       "Name: release_date, dtype: int64"
+      ]
+     },
+     "execution_count": 519,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data = pd.read_csv('movie_bd_v5.xls')\n",
+    "data['release_date']=data.release_date.apply(lambda x: x.split('/')) #разделили даты каждого фильма\n",
+    "data.release_date.apply(lambda x: x[0]).value_counts() #подсчитали количество фильмов для каждого месяца"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "uAJsZ_NeVp_7"
+   },
+   "source": [
+    "# 22. Сколько суммарно вышло фильмов летом? (за июнь, июль, август)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 520,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "Aa-hEREoVp_8"
+   },
+   "outputs": [],
+   "source": [
+    "answers['22'] = '2. 450' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 521,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "450\n"
+     ]
+    }
+   ],
+   "source": [
+    "data = pd.read_csv('movie_bd_v5.xls')\n",
+    "data['release_date']=data.release_date.apply(lambda x: x.split('/')) #разделили дату каждого фильм\n",
+    "data1=data.release_date.apply(lambda x: x[0]).value_counts() #выбрали только месяц\n",
+    "print(data1.loc[\"6\"]+data1.loc[\"7\"]+data1.loc[\"8\"])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "G94ppOY1VqAA"
+   },
+   "source": [
+    "# 23. Для какого режиссера зима – самое продуктивное время года? "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 522,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "RhNTsamuVqAB"
+   },
+   "outputs": [],
+   "source": [
+    "answers['23'] = '5. Peter Jackson' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 523,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Peter Jackson         7\n",
+       "Clint Eastwood        6\n",
+       "Steven Soderbergh     6\n",
+       "Martin Scorsese       4\n",
+       "Nancy Meyers          4\n",
+       "                     ..\n",
+       "Robin Budd            1\n",
+       "Ben Garant            1\n",
+       "Paul W.S. Anderson    1\n",
+       "David Dobkin          1\n",
+       "Richard Eyre          1\n",
+       "Name: director, Length: 358, dtype: int64"
+      ]
+     },
+     "execution_count": 523,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data = pd.read_csv('movie_bd_v5.xls')\n",
+    "data['director']=data.director.apply(lambda x:x.split('|')) \n",
+    "data=data.explode('director')  #разбили режиссеров по одному в строке\n",
+    "data['release_date']=data.release_date.apply(lambda x: x.split('/')[0])\n",
+    "data1=data.loc[data['release_date'].isin(['12','1','2'])] #выбрали только зимние месяцы и отфильтровали\n",
+    "data1['director'].value_counts()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "RBo0JVjVVqAF"
+   },
+   "source": [
+    "# 24. Какая студия дает самые длинные названия своим фильмам по количеству символов?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 524,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "QRGS8L0iVqAG"
+   },
+   "outputs": [],
+   "source": [
+    "answers['24'] = '5. Four By Two Productions' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 525,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "production_companies\n",
+       "Four By Two Productions       83.0\n",
+       "Jim Henson Company, The       59.0\n",
+       "Dos Corazones                 47.0\n",
+       "Museum Canada Productions     46.0\n",
+       "Polsky Films                  46.0\n",
+       "                              ... \n",
+       "Everest Entertainment          3.0\n",
+       "Berlanti Productions           3.0\n",
+       "XM2 Productions                2.0\n",
+       "Ixtlan Productions             2.0\n",
+       "Global Entertainment Group     2.0\n",
+       "Name: original_title, Length: 1771, dtype: float64"
+      ]
+     },
+     "execution_count": 525,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data = pd.read_csv('movie_bd_v5.xls')\n",
+    "data['production_companies']=data.production_companies.apply(lambda x:x.split('|'))\n",
+    "data=data.explode('production_companies')\n",
+    "data['original_title']=data.original_title.apply(lambda x: len(x)) #нашли длину каждого названия фильма\n",
+    "data.groupby('production_companies')['original_title'].mean().sort_values(ascending=False) #отсортировали по убыванию в среднем самые длинные названия"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "9G0hbvR7VqAK"
+   },
+   "source": [
+    "# 25. Описание фильмов какой студии в среднем самые длинные по количеству слов?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 526,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "Ge2GsLNxVqAK"
+   },
+   "outputs": [],
+   "source": [
+    "answers['25'] = '3. Midnight Picture Show' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 527,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "production_companies\n",
+       "Midnight Picture Show                    175.0\n",
+       "Room 9 Entertainment                     161.0\n",
+       "Heineken Branded Entertainment           161.0\n",
+       "98 MPH Productions                       159.0\n",
+       "Brookwell-McNamara Entertainment         156.0\n",
+       "                                         ...  \n",
+       "London Boulevard                          13.0\n",
+       "Phantom Four                              13.0\n",
+       "Henceforth                                13.0\n",
+       "Empire Pictures                           11.0\n",
+       "Motion Picture Corporation of America     11.0\n",
+       "Name: overview, Length: 1771, dtype: float64"
+      ]
+     },
+     "execution_count": 527,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data = pd.read_csv('movie_bd_v5.xls')\n",
+    "data['production_companies']=data.production_companies.apply(lambda x:x.split('|'))\n",
+    "data=data.explode('production_companies')\n",
+    "data['overview']=data.overview.apply(lambda x: len(x.split(' '))) #нашли количество символов в описании каждого фильма\n",
+    "data.groupby('production_companies')['overview'].mean().sort_values(ascending=False)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "FJ1AFt90VqAP"
+   },
+   "source": [
+    "# 26. Какие фильмы входят в 1 процент лучших по рейтингу? \n",
+    "по vote_average"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 528,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "8qmJVq4CVqAQ"
+   },
+   "outputs": [],
+   "source": [
+    "answers['26'] = '1.Inside Out, The Dark Knight, 12 Years a Slave' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 529,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Index(['The Dark Knight', 'The Imitation Game', 'Inside Out', 'Interstellar',\n",
+       "       'Room', 'The Grand Budapest Hotel', 'The Pianist',\n",
+       "       'Guardians of the Galaxy', 'Memento', 'The Wolf of Wall Street',\n",
+       "       'Inception', 'Gone Girl', '12 Years a Slave',\n",
+       "       'The Lord of the Rings: The Return of the King', 'Prisoners',\n",
+       "       'The Fault in Our Stars', 'Eternal Sunshine of the Spotless Mind',\n",
+       "       'The Prestige', 'The Lord of the Rings: The Fellowship of the Ring'],\n",
+       "      dtype='object', name='original_title')"
+      ]
+     },
+     "execution_count": 529,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data = pd.read_csv('movie_bd_v5.xls')\n",
+    "data1=data.sort_values(by='vote_average',ascending=False)[['original_title','vote_average']] #отсортировали фильмы по убыванию в зависимости от рейтинга\n",
+    "percent=round(1*(len(data))/100)\n",
+    "data3=data1.groupby('original_title')['vote_average'].max().sort_values(ascending=False).index[:(percent)] #отфильтровали фильмы со срезом до полученного количества фильмов в 1%\n",
+    "data3\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "MdXsUXbCVqAV"
+   },
+   "source": [
+    "# 27. Какие актеры чаще всего снимаются в одном фильме вместе?\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 530,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "answers['27'] = '5. Daniel Radcliffe & Rupert Grint' #+"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 531,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[(('Daniel Radcliffe', 'Rupert Grint'), 8)]"
+      ]
+     },
+     "execution_count": 531,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data = pd.read_csv('movie_bd_v5.xls')\n",
+    "data['cast']=data.cast.apply(lambda x:x.split('|')) #создали датасет из столбца с актерами\n",
+    "data=data.cast.reset_index() #\n",
+    "data['cast']=data.cast.apply(lambda x: list(itertools.combinations(x, 2))) #комбинируем элементы по парам\n",
+    "data_comb=data.explode('cast') \n",
+    "collections.Counter(data_comb['cast']).most_common(1) #ищем наиболее частую пару актеров"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "colab_type": "text",
+    "id": "U0nONFnGVqAX"
+   },
+   "source": [
+    "# Submission"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 535,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "IfcaRO9-VqAX",
+    "outputId": "0f132912-32bb-4196-c98c-abfbc4ad5a5f"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "{'1': '5. Pirates of the Caribbean: On Stranger Tides (tt1298650) ',\n",
+       " '2': '2. Gods and Generals (tt0279111)',\n",
+       " '3': '3. Winnie the Pooh (tt1449283) ',\n",
+       " '4': '2. 110',\n",
+       " '5': '1. 107',\n",
+       " '6': '5. Avatar (tt0499549)',\n",
+       " '7': '5.The Lone Ranger (tt1210819)',\n",
+       " '8': '1. 1478',\n",
+       " '9': '4. The Dark Knight (tt0468569)',\n",
+       " '10': '5.The Lone Ranger (tt1210819)',\n",
+       " '11': '3. Drama',\n",
+       " '12': '1. Drama',\n",
+       " '13': '5. Peter Jackson',\n",
+       " '14': '3. Robert Rodriguez',\n",
+       " '15': '3. Chris Hemsworth',\n",
+       " '16': '3. Matt Damon',\n",
+       " '17': '1. Drama',\n",
+       " '18': '1. K-19: The Widowmaker (tt0267626)',\n",
+       " '19': '5. 2015',\n",
+       " '20': '1. 2014',\n",
+       " '21': '4. Сентябрь',\n",
+       " '22': '2. 450',\n",
+       " '23': '5. Peter Jackson',\n",
+       " '24': '5. Four By Two Productions',\n",
+       " '25': '3. Midnight Picture Show',\n",
+       " '26': '1.Inside Out, The Dark Knight, 12 Years a Slave',\n",
+       " '27': '5. Daniel Radcliffe & Rupert Grint'}"
+      ]
+     },
+     "execution_count": 535,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# в конце можно посмотреть свои ответы к каждому вопросу\n",
+    "answers\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 533,
+   "metadata": {
+    "colab": {},
+    "colab_type": "code",
+    "id": "uCfuTkRbVqAg"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "27"
+      ]
+     },
+     "execution_count": 533,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# и убедиться что ни чего не пропустил)\n",
+    "len(answers)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "colab": {
+   "name": "Copy of [SF-DST] Movies IMBD v4.1 TEMPLATE.ipynb",
+   "provenance": []
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 1
+}
