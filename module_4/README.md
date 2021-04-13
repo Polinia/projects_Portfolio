@@ -35,7 +35,7 @@ https://www.kaggle.com/c/sf-dst-scoring
 
 Структура репозитория
 -----------------
-В папке [data](https://github.com/Polinia/skillfactory_rds/tree/main/module_4) находятся файлы для скачивания:
+В папке [data](https://github.com/Polinia/skillfactory_rds/tree/main/module_4/data) находятся файлы для скачивания:
 
 * sample_submission.scv
 * test.scv
