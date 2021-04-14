@@ -2,7 +2,7 @@
 Проект №4. Credit Scoring
 ========================
 
-Состав комманды: [Aleksandr ](https://www.kaggle.com/aleksandrbychkov)
+Состав комманды: [Aleksandr](https://github.com/AleksandrBychkov?tab=overview&from=2021-04-01&to=2021-04-14)
 ------------
 Задача
 -----------
