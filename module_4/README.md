@@ -1,9 +1,12 @@
 # skillfactory_rds
 Проект №4. Credit Scoring
 ========================
+
+* Название комманды на Kaggle: Polina&Aleksandr
+* Cостав комманды: [Polina Rudakova](https://github.com/Polinia), [Aleksandr](https://github.com/AleksandrBychkov?tab=overview&from=2021-04-01&to=2021-04-14)
+
+
 Public Score on Kaggle.com: 0.73822
-------------
-Состав комманды: [Polina Rudakova](https://github.com/Polinia), [Aleksandr](https://github.com/AleksandrBychkov?tab=overview&from=2021-04-01&to=2021-04-14)
 ------------
 Задача
 -----------
