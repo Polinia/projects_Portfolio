@@ -2,7 +2,11 @@
 Проект №4. Credit Scoring
 ========================
 
-Состав комманды: [Aleksandr ](https://www.kaggle.com/aleksandrbychkov)
+* Название комманды на Kaggle: Polina&Aleksandr
+* Cостав комманды: [Polina Rudakova](https://github.com/Polinia), [Aleksandr](https://github.com/AleksandrBychkov?tab=overview&from=2021-04-01&to=2021-04-14)
+
+
+Public Score on Kaggle.com: 0.73822
 ------------
 Задача
 -----------
@@ -32,6 +36,21 @@ https://www.kaggle.com/c/sf-dst-scoring
 * app_date - дата подачи заявки
 * default - флаг дефолта по кредиту
 
+В результате работы были достигнуты следующие показатели:
+--------------
+* ROC AUC - 0.739
+* Accuracy score - 0.6744
+* F1-score - 0.6759
+* MSE - 0.3256
+* Recall score - 0.6782
+* TP - 8707
+* FP - 4278
+* FN - 4191
+* TN - 8831
+
+Выводы:
+-------
+Провели ряд стандартных манипуляций по подбору моделей обучения и лучших параметров. Это позволило получить достойные и стабильные на всех частях выборки результаты.
 
 Структура репозитория
 -----------------
