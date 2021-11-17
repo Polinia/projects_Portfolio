@@ -58,4 +58,4 @@ https://www.kaggle.com/c/sf-dst-scoring
 
 * sample_submission.scv
 * test.scv
-* test.scv
+* train.scv
