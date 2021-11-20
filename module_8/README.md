@@ -6,7 +6,7 @@
 * Cостав комманды: [Polina Rudakova](https://github.com/Polinia), [Aleksandr](https://github.com/AleksandrBychkov?tab=overview&from=2021-04-01&to=2021-04-14)
 
 
-Public Score on Kaggle.com: 
+Public Score on Kaggle.com: 10.77901
 ------------
 Задача
 -----------
