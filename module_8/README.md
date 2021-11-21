@@ -1,5 +1,5 @@
 # skillfactory_rds
-Проект №8. Car Price prediction Part2
+Проект №8. Возьмете Бэтмобиль?
 ========================
 
 * Название комманды на Kaggle: Polina&Aleksandr
