@@ -1,4 +1,7 @@
 # Fake/Real Job Posting Prediction
+## Данные расположены по ссылке:
+https://www.kaggle.com/shivamb/real-or-fake-fake-jobposting-prediction
+
 ## Цель:
 обучить модель классифицировать вакансии как реальные или мошеннические.
 
