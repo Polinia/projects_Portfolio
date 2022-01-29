@@ -33,6 +33,14 @@ The aim of the project is to create a model for classification of jobs as real o
 - natural language processing, stop-words cleaning, tokenization and lemmatization
 - obtained the results of the metrics F1 for: CatBoostClassifier, RandomForest, GradientBoosting, KNeighbors and Bi-Directional LSTM
 
+The best result got from CatBoostClassification:
+
+![image](https://user-images.githubusercontent.com/68026029/151677930-14275d20-dd9f-48b4-96ca-3b3a64fb6406.png)
+
+Bi-Directional LSTM:
+
+![image](https://user-images.githubusercontent.com/68026029/151677952-4c79d181-eacc-40e9-ab81-d3efd1fdbfa2.png)
+
 ## Цель:
 обучить модель классифицировать вакансии как реальные или мошеннические.
 
