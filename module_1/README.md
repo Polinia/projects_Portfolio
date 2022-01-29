@@ -1,5 +1,3 @@
-# skillfactory_rds
-
 ## The task of the project:
 to carry out preliminary data analysis of the Big Data based on the dataset from IMBD website using pandas. 
 
@@ -9,7 +7,7 @@ to carry out preliminary data analysis of the Big Data based on the dataset from
 3. My main result is to be able to analyze Big Data having studied a little amount of information on the module. With every new task, I remembered that there is a simpler method
 
 
-
+# skillfactory_rds
 Задачаей проекта было провести анализ данных на основе датасета сайта IMBD с помощью pandas и проверить в работе полученные 
 знания по модулю.
 Количество набранных в викторине баллов: 27
