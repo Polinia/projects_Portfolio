@@ -1,4 +1,4 @@
-## The aim of my project:
+## The aim of the project:
 is to track the impact of the living conditions of students aged 15 to 22 on their results in mathematics for identification students that are at the risk at an early stage. To make conclusions after analyzing the data
 
 ## Objectives:
