@@ -1,14 +1,10 @@
 # Fake/Real Job Posting Prediction
-## Данные расположены по ссылке:
+## This project uses data from Kaggle/ Данные расположены по ссылке:
 https://www.kaggle.com/shivamb/real-or-fake-fake-jobposting-prediction
 
-## Цель:
-обучить модель классифицировать вакансии как реальные или мошеннические.
+The aim of the project is to create a model for classification of jobs as real or fraudulent.
 
-## Постановка задачи:
-Этот проект направлен на создание классификатора, который сможет идентифицировать поддельные и настоящие вакансии работ.Окончательный результат оценивается на основе нескольких моделей. Поскольку предоставленные данные имеют числовые и текстовые характеристики, одна из моделей будет использоваться для текстовых данных. Окончательная модель будет принимать любые соответствующие данные о вакансиях и давать окончательный результат, определяющий, является ли вакансия реальной или нет.
-
-## Описание признаков:
+## Data description:
 - job_id- Identification number given to each job posting
 - title - A name that describes the position or job
 - location - Information about where the job is located
@@ -27,6 +23,22 @@ https://www.kaggle.com/shivamb/real-or-fake-fake-jobposting-prediction
 - Industry - The industry the job posting is relevant to
 - Function - The umbrella term to determining a job’s functionality
 - Fraudulent - The target variable (0: Real, 1: Fake)
+
+## As a result of the work, the following was achieved:
+- dataset examined for duplicates and outliers
+- data cleaning, extraction of numbers and text from features
+- data analysis
+- model evaluation
+- a baseline was created, according to which changes in the dataset were compared
+- natural language processing, stop-words cleaning, tokenization and lemmatization
+- obtained the results of the metrics F1 for: CatBoostClassifier, RandomForest, GradientBoosting, KNeighbors and Bi-Directional LSTM
+
+## Цель:
+обучить модель классифицировать вакансии как реальные или мошеннические.
+
+## Постановка задачи:
+Этот проект направлен на создание классификатора, который сможет идентифицировать поддельные и настоящие вакансии работ.Окончательный результат оценивается на основе нескольких моделей. Поскольку предоставленные данные имеют числовые и текстовые характеристики, одна из моделей будет использоваться для текстовых данных. Окончательная модель будет принимать любые соответствующие данные о вакансиях и давать окончательный результат, определяющий, является ли вакансия реальной или нет.
+
 
 ## В результате работы было достигнуто следующее:
 - датасет проверен на дубликаты и выбросы
