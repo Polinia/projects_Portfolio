@@ -1,3 +1,15 @@
+## The aim of my project:
+is to track the impact of the living conditions of students aged 15 to 22 on their results in mathematics for identification students that are at the risk at an early stage. To make conclusions after analyzing the data
+
+# Objectives:
+- Data processing
+- statistical analysis
+- correlation analysis
+- make conclusions
+
+# Data description:
+![2022-01-29 (3)](https://user-images.githubusercontent.com/68026029/151679067-b1d7b0f3-bcb5-4ccd-8666-495b2b36ae52.png)
+
 # skillfactory_rds
 Ответы на вопросы саморефлексии:
 
