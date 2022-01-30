@@ -1,5 +1,5 @@
-Project #4. Credit Scoring
-========================
+# Project #4. Credit Scoring
+https://www.kaggle.com/polinafedosova/credit-scoring-rudakovap-bychkova
 ## Objectives:
 to build a scoring model for the bank's secondary clients that would predict the probability of a client's default. To do this, it will be necessary to determine the significant parameters of the borrower.
 
