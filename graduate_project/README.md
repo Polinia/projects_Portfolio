@@ -2,7 +2,7 @@
 ## This project uses data from Kaggle/ Данные расположены по ссылке:
 https://www.kaggle.com/shivamb/real-or-fake-fake-jobposting-prediction
 
-The aim of the project is to create a model for classification of jobs as real or fraudulent.
+The aim of the project is to create a model for the classification of jobs as real or fraudulent.
 
 ## Data description:
 - job_id- Identification number given to each job posting
