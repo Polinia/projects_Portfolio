@@ -1,5 +1,5 @@
 ## The aim of the project:
-is to track the impact of the living conditions of students aged 15 to 22 on their results in mathematics for identification students that are at the risk at an early stage. 
+is to track the impact of the living conditions of the students aged between 15 and 22 on their results in mathematics for identification students that are at the risk at an early stage. 
 
 ## Objectives:
 - Data processing, EDA
