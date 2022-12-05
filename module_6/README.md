@@ -1,7 +1,7 @@
 #	Project #6 'Recommendation Challenge'
 https://www.kaggle.com/polinafedosova/polina-aleksandr-recsystem
 ## Goals and objectives of the project: 
-a development of a recommender system for a large online retail company. The recommendation system should be based on the most accurate recommendation of the right product in a high price category.
+a development of a recommendation system for a large online retail company. The recommendation system should be based on the most accurate recommendation of the right product in a high price category.
 ## Data Description:
 
 ![2022-01-30 (3)](https://user-images.githubusercontent.com/68026029/151713090-92e4f472-8962-4a29-a60b-20f765992fe2.png)
