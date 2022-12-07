@@ -1,5 +1,5 @@
 #	Project #6 'Recommendation Challenge'
-https://www.kaggle.com/polinafedosova/polina-aleksandr-recsystem
+https://www.kaggle.com/code/polinafedosova/recommendation-system-for-amazon
 ## Goals and objectives of the project: 
 a development of a recommendation system for a large online retail company. The recommendation system should be based on the most accurate recommendation of the right product in a high price category.
 ## Data Description:
